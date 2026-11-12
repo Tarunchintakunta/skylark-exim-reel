@@ -1,10 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { start } from '../config/content'
 import { setPath } from '../engine/path'
-import { frame, useApp, type Path } from '../engine/store'
-import { onTick } from '../engine/ticker'
-import { film } from '../film/controller'
-import { onCache, progress } from '../film/warmcache'
+import { store, useApp, type Path } from '../engine/store'
 import { Mark } from './Mark'
 import { SiteNav } from './SiteNav'
 import { bindScrolled } from './scrolled'
@@ -21,34 +18,19 @@ export function Header() {
   const root = useRef<HTMLElement>(null)
   const [open, setOpen] = useState(false)
   const path = useApp((s) => s.path)
-  const cache = useRef<HTMLSpanElement>(null)
-  // the warm cache's progress (#251): a hairline under the bar, transform only, gone once the path is cached
-  useEffect(
-    () =>
-      onCache(() => {
-        const p = progress()
-        cache.current!.style.transform = `scaleX(${p})`
-        cache.current!.classList.toggle('is-done', p >= 1)
-      }),
-    [],
-  )
   useEffect(() => bindScrolled((on) => root.current!.classList.toggle('is-scrolled', on)), [])
 
+  // light over the business sections; the quote CTA from the plant stage on (the reel sets store.chapter)
   useEffect(() => {
-    let light = false
-    let cta = false
-    let bar = false
-    return onTick(() => {
-      const id = film.chapters[frame.index]?.id
-      const l = frame.past || id === 'world'
-      if (l !== light) root.current!.classList.toggle('is-light', (light = l))
-      // the plant onward: intake is the first shared chapter after the fork
-      // (no chapters yet while the story chunk loads: findIndex is -1, which must not open the CTA and shift the nav)
-      const intake = film.chapters.findIndex((c) => c.id === 'intake')
-      const plant = frame.past || (intake >= 0 && intake <= frame.index)
-      if (plant !== cta) root.current!.classList.toggle('has-cta', (cta = plant))
-      if (frame.past !== bar) root.current!.classList.toggle('has-bar', (bar = frame.past))
-    })
+    const apply = () => {
+      const { past, chapter } = store.getState()
+      const el = root.current!
+      el.classList.toggle('is-light', past)
+      el.classList.toggle('has-cta', past || chapter === 'plant' || chapter === 'port')
+      el.classList.toggle('has-bar', past)
+    }
+    apply()
+    return store.subscribe(apply)
   }, [])
 
   return (
@@ -95,7 +77,6 @@ export function Header() {
       <a className="quote-cta" href="/quote">
         {start.cta} →
       </a>
-      <span className="cache-bar" ref={cache} aria-hidden="true" />
     </header>
   )
 }

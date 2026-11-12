@@ -1,6 +1,6 @@
 import { readFileSync } from 'node:fs'
 import type { Plugin } from 'vite'
-import { COPY_RIGHT, chaptersFor } from '../src/config/chapters.ts'
+import { stagesFor } from '../src/reel/chain.ts'
 import { exportsLine, start } from '../src/config/content.ts'
 import { heroPoster } from '../src/config/hero.ts'
 import { versioned } from './clip-manifest.ts'
@@ -43,50 +43,29 @@ export function staticHero(): Plugin {
     // no room above the copy even for the small mark (360×640, landscape phones): the inline script measures it once the
     // fonts are in and only drops the copy under the loader (z-index, no layout change), as before #207
     '.hero-under-loader #hero-static{z-index:var(--z-copy)}'
-  // #lcp /story: the opening caption (o1, or p1 for #pond) as static HTML, the same markup as src/film/ChapterCopy.tsx.
-  // It sits where the film's caption sits, under the intro, so the page looks as before; but it paints before any JS
-  // and is /story's LCP. The app's own caption takes its place, same size, once the page has mounted (Loader.tsx).
+  // #lcp /story: the reel's opening caption panel and its first frame as static HTML (same markup and CSS as
+  // src/reel/Reel.tsx), so the first screen paints before any JS; App.tsx removes both once the canvas has taken over.
+  const reelV = (id: string) => readFileSync(new URL('../src/reel/manifest.ts', import.meta.url), 'utf8').match(new RegExp(`'${id}': \\{[^}]*v: '([0-9a-f]+)'`))?.[1] ?? ''
   const caption = () =>
     (['ocean', 'pond'] as const)
       .map((p) => {
-        const ch = chaptersFor(p)[0]
-        const c = ch.captions[0]
-        const m = c.eyebrow?.match(/^(.*?)\s*·\s*(\d{2})$/)
-        const eyebrow = !c.eyebrow ? '' : `<p class="caption__eyebrow mono">${m ? `<span class="caption__num">${m[2]}</span>${esc(m[1])}` : esc(c.eyebrow)}</p>`
-        const place = `${COPY_RIGHT.has(ch.id) ? ' caption--right' : ''}${ch.theme === 'light' ? ' caption--light' : ''}`
-        return `<article class="caption caption--static${place}" data-path="${p}" data-first-screen aria-hidden="true">${eyebrow}<h2 class="caption__title display">${esc(c.title)}</h2>${c.body ? `<p class="caption__body">${esc(c.body)}</p>` : ''}</article>`
+        const st = stagesFor(p)[0]
+        return `<div class="reel-ui reel-static" data-path="${p}" aria-hidden="true"><div class="reel-cap" data-first-screen><p class="reel-cap__eyebrow"><b>01</b><span>${esc(st.label)}</span></p><h2 class="reel-cap__title">${esc(st.title[0])} <em>${esc(st.title[1])}</em></h2><div class="reel-cap__lines"><p class="reel-cap__line is-on">${esc(st.lines[0])}</p></div></div></div>`
       })
       .join('') +
-    // the store picks the path the same way (engine/store.ts): #pond, else the ocean
-    `<script>document.querySelector('.caption--static[data-path="'+(location.hash==='#pond'?'ocean':'pond')+'"]').remove()</script>`
-  // #309: /story's opening picture as static HTML, under the intro, so the first chapter's true first frame is on screen
-  // at once (Terminal Industries' pattern) instead of a blank intro. It is the very file the stage draws first (desktop:
-  // the frame sequence's frame 0, same versioned URL as segments.ts seqUrl; upright phones: the clip's portrait poster),
-  // so it costs no second download. Loader.tsx removes it once the stage has taken over. Landscape phones, Save-Data
-  // and 3G (the 960 tier) keep the plain intro.
+    `<script>document.querySelector('.reel-static[data-path="'+(location.hash==='#pond'?'ocean':'pond')+'"]').remove()</script>`
   const firstFrame = () => {
-    const manifest = readFileSync(new URL('../src/film/manifest.ts', import.meta.url), 'utf8')
-    const seqV = (id: string) => manifest.match(new RegExp(`'${id}': \\{ frames: \\d+,[^}]*v: '([0-9a-f]+)'`))?.[1]
     const urls = Object.fromEntries(
       (['ocean', 'pond'] as const).map((p) => {
-        const id = chaptersFor(p).flatMap((ch) => ch.media).find((m) => m.kind === 'video')!.id
-        const v = seqV(id)
-        const seq = (ext: string) => (v ? `/media/${id}-f_1920_000.${ext}?v=${v}` : '')
-        return [p, { seq: [seq('avif'), seq('webp')], m: [versioned(`${id}_m.avif`), versioned(`${id}_m.webp`)] }]
+        const id = stagesFor(p)[0].clips[0]
+        return [p, { d: `/media/reel/${id}/d/000.avif?v=${reelV(id)}`, m: `/media/reel/${id}/m/000.avif?v=${reelV(id)}` }]
       }),
     )
-    return `<script>(function(){var U=${JSON.stringify(urls)}[location.hash==='#pond'?'pond':'ocean'],q=function(m){return matchMedia(m).matches},c=navigator.connection||{},mob=q('(max-width: 819px)')||q('(pointer: coarse)');if(c.saveData||/^(slow-2g|2g|3g)$/.test(c.effectiveType||''))return;var f=mob?(innerHeight>innerWidth?U.m:null):U.seq;if(!f||!f[0])return;document.currentScript.insertAdjacentHTML('afterend','<picture id="first-frame" aria-hidden="true"><source type="image/avif" srcset="'+f[0]+'"><img src="'+f[1]+'" alt="" fetchpriority="high" decoding="async"></picture>')})()</script>`
+    return `<script>(function(){var U=${JSON.stringify(urls)}[location.hash==='#pond'?'pond':'ocean'],q=function(m){return matchMedia(m).matches},mob=(q('(max-width: 819px)')||q('(pointer: coarse)'))&&innerHeight>innerWidth;document.currentScript.insertAdjacentHTML('afterend','<img id="first-frame" src="'+(mob?U.m:U.d)+'" alt="" fetchpriority="high" decoding="async">')})()</script>`
   }
-  // held invisible until the fonts are in, like the hero copy (a fallback-font first paint would re-flow it: CLS)
-  // (line-height: the 0.98 lines plus the 0.06em each SplitText line gets, so the title is as tall as the film's)
-  // (bottom: chrome.css's phone rule arrives with the app's CSS and film.css's comes back with the lazy story chunk; the
-  // film's caption ends on film.css's, so the static one keeps it throughout: no 29 px jump, CLS 0)
-  const bottom = readFileSync(new URL('../src/film/film.css', import.meta.url), 'utf8').match(/bottom:\s*(clamp\([^;]+\));/)![1]
   const captionCss =
-    css('film/film.css') +
-    // the static first frame (#309) under the opening caption (z 10) and the intro, which thins to a light veil over it (story.html)
-    `#first-frame img{position:fixed;inset:0;width:100%;height:100%;object-fit:cover;z-index:9;pointer-events:none}` +
-    `.fonts-in .caption--static{visibility:visible;opacity:1}.caption--static .caption__title{line-height:1.04}.caption.caption--static{bottom:${bottom}}`
+    css('reel/reel.css') +
+    `#first-frame{position:fixed;inset:0;width:100%;height:100%;object-fit:cover;z-index:9;pointer-events:none}.reel-static{z-index:11}`
   // the hero poster (LCP image, #hd): AVIF preloads with the hero <picture>'s own sources, so the browser picks the same
   // file for both; browsers without AVIF skip them (type) and load the WebP from the <picture>
   const preload = () =>

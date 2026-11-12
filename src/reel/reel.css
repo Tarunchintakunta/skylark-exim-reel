@@ -1,0 +1,92 @@
+/* The reel (/story): fixed canvas stage, a fixed caption panel bottom-left, a thin chapter rail on the right and the
+   "choose a stage" picker. Captions sit on a local shade only (never a full-frame tint); copy is >= 4.5:1 over it. */
+.reel { position: relative; }
+.reel__stage {
+  position: fixed; inset: 0; width: 100%; height: 100%; z-index: 0; background: #0d1d22;
+  transition: opacity 0.4s var(--ease-out);
+}
+.reel.is-past .reel__stage, .reel.is-past .reel-ui { opacity: 0; visibility: hidden; }
+.reel__track { position: relative; z-index: 1; pointer-events: none; }
+.reel__mark { position: absolute; left: 0; width: 1px; height: 1px; }
+
+.reel-ui { position: fixed; inset: 0; z-index: 10; pointer-events: none; transition: opacity 0.4s var(--ease-out); }
+
+/* caption panel: fixed bottom-left, never moves; only its contents fade */
+.reel-cap {
+  position: absolute; left: var(--gutter); bottom: clamp(24px, 6vh, 64px);
+  width: min(560px, calc(100vw - 2 * var(--gutter) - 40px));
+  padding: clamp(18px, 2vw, 28px) clamp(18px, 2vw, 30px) clamp(16px, 1.8vw, 24px);
+  border-radius: 14px;
+  background: rgba(7, 18, 22, 0.62);
+  -webkit-backdrop-filter: blur(14px) saturate(1.2); backdrop-filter: blur(14px) saturate(1.2);
+  border: 1px solid rgba(246, 242, 234, 0.12);
+  color: var(--ice);
+}
+.reel-cap__eyebrow { margin: 0 0 10px; font: 500 0.75rem/1 var(--f-body); letter-spacing: 0.12em; text-transform: uppercase; color: rgba(246, 242, 234, 0.82); display: flex; gap: 10px; }
+.reel-cap__eyebrow b { font-weight: 700; color: var(--brass); font-variant-numeric: tabular-nums; }
+.reel-cap__title { margin: 0; font: 700 clamp(1.9rem, 3.4vw, 3.25rem)/1.02 var(--f-body); letter-spacing: -0.02em; min-height: 2.04em; }
+.reel-cap__title em { font: italic 400 1.12em/1 var(--f-display); letter-spacing: 0; color: #f3d9b8; }
+.reel-cap__lines { position: relative; margin-top: 14px; min-height: 3.2em; }
+.reel-cap__line {
+  position: absolute; inset: 0 auto auto 0; margin: 0; font: 400 var(--fs-body)/1.5 var(--f-body); color: rgba(246, 242, 234, 0.92);
+  opacity: 0; transform: translateY(6px); transition: opacity 0.45s var(--ease-out), transform 0.45s var(--ease-out);
+}
+.reel-cap__line.is-on { opacity: 1; transform: none; }
+.reel-cap__title, .reel-cap__eyebrow { transition: opacity 0.35s var(--ease-out); }
+.reel-cap.is-swap .reel-cap__title, .reel-cap.is-swap .reel-cap__eyebrow { opacity: 0; }
+
+/* chapter rail: thin line on the right, a tick per stage, a fill for progress */
+.reel-rail { position: absolute; right: clamp(14px, 2vw, 32px); top: 50%; transform: translateY(-50%); height: min(44vh, 360px); width: 2px; background: rgba(246, 242, 234, 0.22); pointer-events: auto; }
+.reel-rail__fill { position: absolute; left: 0; top: 0; width: 2px; height: 100%; background: var(--ice); transform-origin: top; transform: scaleY(0); }
+.reel-rail__tick { position: absolute; left: 50%; width: 30px; height: 30px; margin: -15px 0 0 -15px; display: grid; place-items: center; background: none; border: 0; padding: 0; cursor: pointer; }
+.reel-rail__tick::before { content: ''; width: 8px; height: 8px; border-radius: 50%; background: rgba(246, 242, 234, 0.5); box-shadow: 0 0 0 3px rgba(7, 18, 22, 0.45); transition: transform 0.3s var(--ease-out), background 0.3s; }
+.reel-rail__tick[aria-current='step']::before { background: var(--brass); transform: scale(1.4); }
+.reel-rail__tick span { position: absolute; right: 26px; white-space: nowrap; font: 500 0.75rem/1 var(--f-body); color: var(--ice); background: rgba(7, 18, 22, 0.72); padding: 6px 9px; border-radius: 6px; opacity: 0; transform: translateX(4px); transition: opacity 0.25s, transform 0.25s; pointer-events: none; }
+.reel-rail__tick:hover span, .reel-rail__tick:focus-visible span { opacity: 1; transform: none; }
+
+/* stage picker (frosted glass, floor-picker style) */
+.reel-pick { position: absolute; right: var(--gutter); bottom: clamp(24px, 6vh, 64px); pointer-events: auto; display: flex; flex-direction: column; align-items: flex-end; gap: 10px; }
+.reel-pick__btn, .reel-pick__panel {
+  background: rgba(20, 34, 38, 0.55); -webkit-backdrop-filter: blur(16px) saturate(1.3); backdrop-filter: blur(16px) saturate(1.3);
+  border: 1px solid rgba(246, 242, 234, 0.18); color: var(--ice);
+}
+.reel-pick__btn { font: 500 0.875rem/1 var(--f-body); padding: 12px 16px; border-radius: 999px; cursor: pointer; }
+.reel-pick__panel { border-radius: 14px; padding: 8px; min-width: 240px; }
+.reel-pick__panel[hidden] { display: none; }
+.reel-pick__panel ol { list-style: none; margin: 0; padding: 0; }
+.reel-pick__panel button { display: flex; align-items: baseline; gap: 12px; width: 100%; padding: 12px 12px; border: 0; border-radius: 9px; background: none; color: var(--ice); text-align: left; cursor: pointer; font: 500 1rem/1.2 var(--f-body); }
+.reel-pick__panel button:hover, .reel-pick__panel button:focus-visible { background: rgba(246, 242, 234, 0.1); }
+.reel-pick__panel button[aria-current='step'] { background: rgba(224, 138, 95, 0.22); }
+.reel-pick__panel b { font: 700 0.75rem/1 var(--f-body); color: #f2b48f; font-variant-numeric: tabular-nums; }
+.reel-pick__panel em { font: italic 400 1.15em/1 var(--f-display); }
+
+@media (max-width: 819px) {
+  .reel-cap { bottom: 88px; width: calc(100vw - 2 * var(--gutter)); }
+  .reel-rail { right: 8px; height: 30vh; }
+  .reel-pick { right: var(--gutter); bottom: 24px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .reel-cap__line, .reel-cap__title, .reel-cap__eyebrow { transition: none; }
+}
+
+/* products: tilted 3D card carousel with a 01 / 0N counter */
+.carousel { position: relative; padding: var(--space-section) 0; background: var(--light); color: var(--ink); overflow: hidden; }
+.carousel__head { padding: 0 var(--gutter); display: flex; align-items: end; justify-content: space-between; gap: 24px; flex-wrap: wrap; }
+.carousel__title { margin: 0; font: 700 var(--fs-h2)/1.02 var(--f-body); letter-spacing: -0.02em; }
+.carousel__title em { font: italic 400 1.12em/1 var(--f-display); color: var(--brass-ink); }
+.carousel__count { font: 500 1rem/1 var(--f-body); font-variant-numeric: tabular-nums; color: var(--ink-2); }
+.carousel__count b { color: var(--ink); font-weight: 700; }
+.carousel__nav { display: flex; gap: 8px; }
+.carousel__nav button { width: 48px; height: 48px; border-radius: 50%; border: 1px solid var(--hairline-ink); background: #fff; color: var(--ink); font-size: 1.25rem; cursor: pointer; }
+.carousel__nav button:disabled { opacity: 0.4; cursor: default; }
+.carousel__stage { perspective: 1400px; margin-top: 40px; height: clamp(420px, 52vw, 560px); position: relative; }
+.carousel__card {
+  position: absolute; left: 50%; top: 0; width: clamp(240px, 30vw, 360px); margin-left: calc(clamp(240px, 30vw, 360px) / -2);
+  border-radius: 16px; overflow: hidden; background: #fff; box-shadow: 0 30px 60px -30px rgba(11, 42, 51, 0.45);
+  transform-style: preserve-3d; transition: transform 0.7s var(--ease-out), opacity 0.7s var(--ease-out);
+}
+.carousel__card img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; }
+.carousel__card div { padding: 18px 20px 22px; }
+.carousel__card h3 { margin: 0 0 6px; font: 700 1.25rem/1.15 var(--f-body); }
+.carousel__card p { margin: 0; color: var(--ink-2); font-size: 0.9375rem; line-height: 1.45; }
+@media (prefers-reduced-motion: reduce) { .carousel__card { transition: none; } }

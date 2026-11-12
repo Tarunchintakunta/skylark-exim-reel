@@ -1,49 +1,12 @@
-import { COPY_RIGHT, type ChapterDef, type Media } from '../config/chapters'
 import { heroPoster } from '../config/hero'
 import { env } from '../engine/env'
-import { MEDIA_V, SEQ, TOP, type Codec, type Tier } from './manifest'
+import { MEDIA_V, TOP, type Codec, type Tier } from './manifest'
 import { mediaUrl } from './media'
 
-export interface Segment {
-  media: Media
-  chapter: number
-  /** range inside the chapter's local progress */
-  from: number
-  to: number
-  /** set on the last segment of a chapter */
-  join?: ChapterDef['joinNext']
-  scrim?: ChapterDef['scrim']
-  /** the chapter's copy sits in the right-hand column (the soft scrim shades that side) */
-  right?: boolean
-  /** this segment's desktop scroll length in vh (its share of the chapter's) */
-  vh: number
-}
-
 /**
- * A chapter's scroll length is split evenly across its media, unless a still or a video sets its `span`.
- * Segments inside a chapter cut straight to each other (scrub.ts); the last one uses the chapter's join.
+ * Media helpers for the homepage (hero loop, story-entry cards, plant stills, globe): codec and tier choice, versioned
+ * URLs. /story's reel has its own frame sets (src/reel).
  */
-export function toSegments(chapters: ChapterDef[]): Segment[] {
-  return chapters.flatMap((ch, chapter) =>
-    segmentBounds(ch).map(([from, to], j, all) => {
-      const last = j === all.length - 1
-      return { media: ch.media[j], chapter, from, to, vh: ch.vh * (to - from), join: last ? ch.joinNext : ('crossfade' as const), scrim: ch.scrim, right: COPY_RIGHT.has(ch.id) }
-    }),
-  )
-}
-
-/** [from, to] of each of a chapter's media inside its local progress */
-export function segmentBounds(ch: ChapterDef): [number, number][] {
-  let from = 0
-  return ch.media.map((media, j, all) => {
-    const span = (media.kind === 'still' || media.kind === 'video') && media.span ? media.span : 1 / all.length
-    const to = j === all.length - 1 ? 1 : from + span
-    const b: [number, number] = [from, to]
-    from = to
-    return b
-  })
-}
-
 export { mediaUrl }
 
 const TYPES: Record<Codec, string> = {
@@ -117,31 +80,3 @@ const posterTier = (id: string, w: Tier): Tier =>
 export const posterUrl = (id: string, w: Tier = W) => img(`${id}_${posterTier(id, served(w))}`)
 /** a clip's first frame as a home card, AVIF or WebP at 960 / 1280 / 1920 (covers 2× on a desktop card, 3× on a phone) */
 export const cardSrcSet = (id: string, ext: 'avif' | 'webp') => [960, 1280, 1920].map((w) => `${mediaUrl(`${id}_${w}.${ext}`)} ${w}w`).join(', ')
-/** stand-in stills (ph-*) come from 3840 px masters: the tier that covers the frame, up to 2560 */
-const stillW = (w: Tier): Tier => (w === 'm' || w === 960 ? w : (([1280, 1920, 2560] as const).find((t) => t >= px) ?? 2560))
-const stillUrl = (id: string, w: Tier) => (id.startsWith('ph-') ? img(`${id}_${stillW(w)}`) : posterUrl(id, w))
-
-/**
- * Desktop frame sequences (#hd2, chapters.ts SEQ_CLIPS): the stage canvas plays these clips frame by frame instead of a
- * <video>. Phones, Save-Data and 3G keep the video. One 1920 AVIF set on every desktop tier (scripts/clip-frames.sh).
- */
-export const isSeq = (id: string) => !env.mobile && W !== 960 && W !== 'm' && id in SEQ
-export const seqFrames = (id: string) => SEQ[id]?.frames ?? 0
-/**
- * One 1920 AVIF set per CG clip (PR #324, 12 Nov): from the master, lanczos and a light unsharp, each set encoded at the
- * highest crf whose SSIM still matches the sharp WebP q 55-70 KB sets (scripts/clip-frames.sh SSIM_MATCH), ~45-63 KB a
- * frame. AVIF only: every desktop browser that runs the canvas decodes it (Chrome 85, Firefox 93, Safari 16)
- */
-export const seqUrl = (id: string, i: number) => `/media/${id}-f_1920_${String(i).padStart(3, '0')}.avif?v=${SEQ[id]?.v}`
-
-/**
- * First-frame poster for a segment, or null for gradient/globe and for a desktop frame-set clip (the canvas draws its
- * frame 0; a poster under it would only be bytes). `w` is the media tier (tests pass each one).
- */
-export function posterFor(m: Media, w: Tier = W): string | null {
-  if (m.kind === 'video') return isSeq(m.id) ? null : posterUrl(m.id, w)
-  if (m.kind === 'still') return stillUrl(m.poster, w)
-  // documentation: a pre-blurred, darkened still (no live CSS blur over the stage)
-  if (m.kind === 'dom') return stillUrl(`${m.poster}-blur`, w)
-  return null
-}

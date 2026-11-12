@@ -34,7 +34,7 @@ export function startClock() {
 }
 
 /** One clock for everything (TRD §1): the shared frame loop drives Lenis, ScrollTrigger and every per-frame callback. */
-export function startEngine() {
+export function startEngine(opts: { lerp?: number; wheel?: number } = {}) {
   if (started) return
   started = true
   // Touch and reduced motion keep native scrolling.
@@ -43,7 +43,7 @@ export function startEngine() {
     // terminal-industries.com scrolls (was lerp 0.08 / wheel 0.8). A/B on the preview, 1440×900, a 100 px notch every
     // 50 ms through the whole wild path down and up: the page trails the wheel 61 / 88 px (mean / p95) at 0.12,
     // 50 / 77 at 0.14, 42 / 69 at 0.16 (71 / 112 before), 60 fps and no frozen frame at each. The scrub adds no easing.
-    lenis = new Lenis({ autoRaf: false, lerp: LERP, wheelMultiplier: 1, smoothWheel: true, syncTouch: false })
+    lenis = new Lenis({ autoRaf: false, lerp: opts.lerp ?? LERP, wheelMultiplier: opts.wheel ?? 1, smoothWheel: true, syncTouch: false })
     lenis.on('scroll', ScrollTrigger.update)
   }
   if (env.coarse) ScrollTrigger.config({ ignoreMobileResize: true })

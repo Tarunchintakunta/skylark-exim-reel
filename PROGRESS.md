@@ -3,7 +3,7 @@
 **Live URL:** not deployed yet
 **Repo:** https://github.com/Tarunchintakunta/skylark-exim-reel
 **Source:** code copied from `Miyo-global/skylark-exim-v3` branch `feat/cg-story` at `bc4defb6` (copy only; v3 untouched)
-**Credits:** 0 / 400 (stop and ask at 350)
+**Credits:** 52.25 / 400 (stop and ask at 350)
 
 ## Plan: one continuous camera journey per path
 
@@ -55,6 +55,15 @@ live-action plant clips (different light and setting, cannot be chained).
 
 | # | Item | Model | Charged | Running |
 |---|------|-------|---------|---------|
+| 1 | E1 still (stern, net haul) - rejected: different vessel layout | GPT Image 2.6 high 4K | 4.25 | 4.25 |
+| 2 | P1 still (packing hall) | GPT Image 2.6 high 4K | 4.25 | 8.50 |
+| 3 | o2 720p test (depart-1 last to E1) - FAIL: stern morphs, crew pop in at ~2.3 s | Kling 4.0 720p 5 s | 11.25 | 19.75 |
+| 4 | E3 still (high aerial, coast) - rejected with E1 | GPT Image 2.6 high 4K | 4.25 | 24.00 |
+| 5 | P2 still (cold store aisle) | GPT Image 2.6 high 4K | 4.25 | 28.25 |
+| 6 | P3 still (pallet into reefer at the dock) | GPT Image 2.6 high 4K | 4.25 | 32.50 |
+| 7 | E1' still (same vessel from behind, nobody on deck) | GPT Image 2.6 high 4K | 4.25 | 36.75 |
+| 8 | E3' still (same vessel, high aerial, coast and plant ahead) | GPT Image 2.6 high 4K | 4.25 | 41.00 |
+| 9 | o2 720p retake test (depart-1 last to E1') | Kling 4.0 720p 5 s | 11.25 | 52.25 |
 
 ## Done
 
@@ -67,3 +76,6 @@ live-action plant clips (different light and setting, cannot be chained).
 ## Blockers
 
 - none
+
+Reconciled against Higgsfield `transactions` (12 Nov, 11:54-12:05 UTC); other charges in that window belong to another
+session on the same account and are not counted here.

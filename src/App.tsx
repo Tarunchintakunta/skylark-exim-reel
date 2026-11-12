@@ -1,63 +1,42 @@
 import { lazy, Suspense, useEffect } from 'react'
-import { chaptersFor, firstClip } from './config/chapters'
-import { storyReady } from './engine/boot'
 import { bindPathHash } from './engine/path'
-import { store, useApp } from './engine/store'
-import { scrollToY } from './engine/ticker'
-import { ScrubStage } from './film/ScrubStage'
-import { warm } from './film/scrub'
-import { onCache, openingProgress, openingReady, startWarmCache } from './film/warmcache'
-import { Loader, type Gate } from './ui/Loader'
+import { store } from './engine/store'
+import { Reel } from './reel/Reel'
 import { Header } from './ui/Header'
 
-const Story = lazy(() => import('./Story'))
+const Sections = lazy(() => import('./reel/Sections'))
 
-// the chosen path's first clip (#ocean / #pond, else wild catch): started at mount, with nothing waiting on it (#264)
-const clip = firstClip(store.getState().path)
-const first = clip ? [clip.id] : []
-/** the intro holds until the active path's first clip is in memory; the rest of the path keeps warming (#preload) */
-const gate: Gate = { ready: openingReady, progress: openingProgress, onCache }
+/** the intro (story.html #boot) opens once the reel's first frames are decoded; its CSS failsafe still opens it at 3 s */
+function reveal() {
+  if (store.getState().ready) return
+  store.setState({ ready: true })
+  const boot = document.getElementById('boot')
+  if (boot) {
+    boot.style.transition = 'opacity .35s ease'
+    boot.style.opacity = '0'
+    setTimeout(() => boot.remove(), 400)
+  }
+  document.getElementById('first-frame')?.remove()
+  document.querySelector('.reel-static')?.remove()
+  store.setState({ revealed: true })
+}
 
+/** /story: the reel, then the business sections. Every load opens on stage 1, frame 1 (story.html resets the scroll). */
 export default function App() {
-  const path = useApp((s) => s.path)
-  const ready = useApp((s) => s.ready)
-  const chapters = chaptersFor(path)
-  useEffect(() => {
-    if (!ready) return
-    const id = location.hash.slice(1)
-    if (!id || id === 'ocean' || id === 'pond') return
-    let raf = 0
-    let frames = 0
-    const tick = () => {
-      frames += 1
-      if (document.getElementById('boot') && frames < 180) {
-        raf = requestAnimationFrame(tick)
-        return
-      }
-      const el = document.getElementById(id)
-      if (el) scrollToY(el.getBoundingClientRect().top + window.scrollY, true)
-    }
-    raf = requestAnimationFrame(tick)
-    return () => cancelAnimationFrame(raf)
-  }, [ready])
-  // #ocean / #pond: the path anchors (#210); other section anchors (/#products from /quote) are handled above
   useEffect(bindPathHash, [])
-  // the first clip starts at mount, alongside the warm cache's load of the whole path
-  useEffect(() => void warm(first), [])
-  useEffect(startWarmCache, [])
+  useEffect(() => scrollTo(0, 0), [])
   return (
     <>
       <a className="skip-link mono" href="#main">Skip to content</a>
       <a className="skip-link mono" href="/quote">Skip to quote</a>
-      <ScrubStage chapters={chapters} />
       <Header />
       <main id="main" tabIndex={-1}>
         <h1 className="sr-only">Our story: from sea and pond to port</h1>
+        <Reel onReady={reveal} />
         <Suspense fallback={null}>
-          <Story chapters={chapters} />
+          <Sections />
         </Suspense>
       </main>
-      <Loader mounted={storyReady} gate={gate} />
     </>
   )
 }

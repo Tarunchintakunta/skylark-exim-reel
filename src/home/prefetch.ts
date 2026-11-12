@@ -1,9 +1,8 @@
-import { firstClip } from '../config/chapters'
 import { decodeAll } from '../engine/boot'
 import { env } from '../engine/env'
 import { store, type Path } from '../engine/store'
-import { CLIPS } from '../film/manifest'
-import { avifReady, clipUrl, codecReady, isSeq, posterUrl } from '../film/segments'
+import { stagesFor } from '../reel/chain'
+import { frameUrl, phone } from '../reel/engine'
 import { earthBitmap } from '../three/globeState'
 import type { Gate } from '../ui/Loader'
 import { heroReady } from './HomeHero'
@@ -41,15 +40,16 @@ const storyScripts = () =>
     })
     .catch(() => void (scripts = null)))
 
-/** The /story chunk and that path's first chapter (o1 / p1): its poster and clip, at the tier /story will ask for. */
+/** the reel's first frames of a path, at the set /story will ask for */
+const firstFrames = (path: Path, n: number) => {
+  const clip = stagesFor(path)[0].clips[0]
+  return Array.from({ length: n }, (_, i) => frameUrl(clip, i, phone() ? 'm' : 'd'))
+}
+
+/** The /story chunk and that path's opening frame. */
 export function prefetchStory(path: Path) {
   void storyScripts()
-  const clip = firstClip(path)
-  if (!clip) return
-  // a frame-set clip draws its own frame 0 on the canvas: no poster, no video
-  if (isSeq(clip.id)) return
-  hint('prefetch', posterUrl(clip.id), 'image')
-  hint('prefetch', clipUrl(clip.id), 'video')
+  hint('prefetch', firstFrames(path, 1)[0], 'image')
 }
 
 /** Hover or keyboard focus on any story link (nav, hero fork, story cards) warms /story; nothing loads before that. */
@@ -94,8 +94,8 @@ export function homeGate(mounted: Promise<void>): Gate {
   }
 }
 
-/** clips of the active path warmed from the homepage after the intro. Not the other path, and not the port frames. */
-const STORY_LOOKAHEAD = 4
+/** reel frames of the active path warmed from the homepage after the intro */
+const STORY_LOOKAHEAD = 24
 
 /**
  * The story, warmed from the homepage (#preload): once the intro has opened and the browser is idle, the first clips
@@ -112,11 +112,7 @@ export function warmStory() {
   if (env.saveData || env.slow) return (markWarm(), () => {})
   const ctl = new AbortController()
   const go = async () => {
-    await Promise.all([codecReady, avifReady])
-    const urls = CLIPS[store.getState().path]
-      .filter((c) => !isSeq(c.id))
-      .slice(0, STORY_LOOKAHEAD)
-      .map((c) => clipUrl(c.id))
+    const urls = firstFrames(store.getState().path, STORY_LOOKAHEAD)
     const one = (u: string) => fetch(u, { signal: ctl.signal, priority: 'low' } as RequestInit).then((r) => r.blob()).catch(() => null)
     await Promise.all(Array.from({ length: 2 }, async () => {
       while (urls.length && !ctl.signal.aborted) await one(urls.shift()!)
