@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#f4efe6" />
+    <meta name="description" content="News and updates from Skylark Exim, the seafood exporter in Visakhapatnam." />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Skylark Exim" />
+    <meta property="og:title" content="News &amp; updates | Skylark Exim" />
+    <meta property="og:description" content="News and updates from Skylark Exim, the seafood exporter in Visakhapatnam." />
+    <meta property="og:url" content="https://skylarkexim.com/news" />
+    <meta property="og:image" content="https://skylarkexim.com/media/hero-loop_1280.webp" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="canonical" href="https://skylarkexim.com/news" />
+    <link rel="icon" href="/favicon-48.webp" type="image/webp" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="preload" href="/fonts/instrument-serif-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/inter-tight-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin />
+    <title>News &amp; updates | Skylark Exim</title>
+  </head>
+  <body>
+    <!-- #308 LCP: the index's heading as static HTML (the same markup as src/pages/NewsPage.tsx), painted before any JS;
+         src/engine/first-screen.ts requests the app once it is on screen, and React's render takes its place, same box.
+         An article (/news/<slug>) has another heading: the script drops it there, and the app boots at once. -->
+    <div id="root"><div class="doc" data-first-screen><main class="doc-main"><header class="section__head"><p class="eyebrow">News</p><h1 class="section__title">News &amp; updates</h1></header></main></div></div>
+    <script>if(/^\/news\/./.test(location.pathname))document.getElementById('root').textContent=''</script>
+    <script type="module" src="/src/news-main.tsx"></script>
+  </body>
+</html>

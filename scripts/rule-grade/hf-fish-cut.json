@@ -1,0 +1,10 @@
+{"track": [[0, 0, 1, 0.45]], "objects": [
+  {"name": "stack, front left", "poly": [[-60, 590], [210, 590], [210, 1010], [-60, 1010]], "still": true},
+  {"name": "crate behind the worker", "poly": [[290, 450], [530, 450], [530, 710], [290, 710]], "still": true},
+  {"name": "crates, centre", "poly": [[1640, 505], [1800, 505], [1800, 655], [1640, 655]], "still": true},
+  {"name": "bin, centre", "poly": [[1860, 535], [1970, 535], [1970, 605], [1860, 605]], "still": true},
+  {"name": "crate, back centre", "poly": [[1440, 405], [1540, 405], [1540, 475], [1440, 475]], "still": true},
+  {"name": "stack, right", "poly": [[2030, 455], [2240, 455], [2240, 870], [2030, 870]], "still": true},
+  {"name": "stack, right back", "poly": [[1975, 355], [2120, 355], [2120, 495], [1975, 495]], "still": true},
+  {"name": "crate, right back", "poly": [[2165, 425], [2260, 425], [2260, 525], [2165, 525]], "still": true}
+ ]}

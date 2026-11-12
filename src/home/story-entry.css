@@ -1,0 +1,128 @@
+/* Story Entry (#268): three bento cards after the hero; a card grows to the viewport and its facts float in. */
+.se { --se-pad: clamp(20px, 2.4vw, 40px); position: relative; z-index: var(--z-content); padding: var(--gutter); background: var(--deep-2); color: var(--ice); }
+.se-lead { max-width: 68ch; margin: 0 0 clamp(16px, 2.2vh, 28px); font-size: clamp(0.9375rem, 0.35vw + 0.82rem, 1.0625rem); line-height: 1.45; color: rgba(246, 242, 234, 0.9); }
+/* an open card covers the fixed header too: the section's own stacking context goes above the chrome while it is open */
+.se.is-open { z-index: 60; }
+.se-grid { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); grid-template-rows: repeat(2, minmax(0, 1fr)); gap: clamp(12px, 1.25vw, 24px); height: 88vh; min-height: 560px; }
+/* the card's corner lives on its cell: StoryEntry reads it back to shrink the open card into it */
+.se-cell { position: relative; border-radius: var(--radius-card); }
+.se-cell--wild { grid-column: 1 / 8; grid-row: 1 / 3; }
+.se-cell--farmed { grid-column: 8 / 13; grid-row: 1; }
+.se-cell--world { grid-column: 8 / 13; grid-row: 2; }
+
+.se-card { position: absolute; inset: 0; overflow: hidden; isolation: isolate; border-radius: inherit; background: var(--deep); color: var(--ice); }
+.se-card.is-open { position: fixed; z-index: 60; border-radius: 0; }
+
+/* media: the still, its loop over it once playing, a scrim for the grid copy and a lighter veil for the open state */
+.se-media { position: absolute; inset: 0; z-index: -1; }
+.se-media__still, .se-media__loop { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transition: scale 1.4s var(--ease-out); }
+.se-media__loop { opacity: 0; transition: opacity 0.6s var(--ease-out), scale 1.4s var(--ease-out); }
+.se-media__loop.is-on { opacity: 1; }
+/* a real hover only: on touch a tap leaves :hover stuck, and the zoom would draw the frame past its pixels */
+@media (hover: hover) { .se-card:not(.is-open):hover :is(.se-media__still, .se-media__loop) { scale: 1.035; } }
+.se-media__scrim, .se-media__veil { position: absolute; inset: 0; transition: opacity 0.6s var(--ease-out); }
+.se-media__scrim { background: linear-gradient(to top, rgba(7, 31, 38, 0.9) 0%, rgba(7, 31, 38, 0.45) 42%, rgba(7, 31, 38, 0) 68%), linear-gradient(to bottom, rgba(7, 31, 38, 0.45), rgba(7, 31, 38, 0) 28%); }
+/* open: the photo stays bright; only the copy's centre and the widget rails at the edges darken */
+.se-media__veil { opacity: 0; background: radial-gradient(ellipse 42% 46% at 50% 50%, rgba(7, 31, 38, 0.62) 0%, rgba(7, 31, 38, 0.3) 60%, rgba(7, 31, 38, 0) 100%), linear-gradient(to right, rgba(7, 31, 38, 0.5) 0%, rgba(7, 31, 38, 0) 24%, rgba(7, 31, 38, 0) 76%, rgba(7, 31, 38, 0.5) 100%); }
+.se-card.is-open .se-media__scrim { opacity: 0; }
+.se-card.is-open .se-media__veil { opacity: 1; }
+
+/* the world card: a dark field and the thin-line globe */
+.se-card--dark { background: radial-gradient(120% 90% at 85% 40%, var(--bay) 0%, var(--deep) 45%, var(--deep-2) 100%); }
+.se-card--dark .se-media__scrim { background: linear-gradient(to right, rgba(7, 31, 38, 0.85) 0%, rgba(7, 31, 38, 0) 60%); }
+.se-card--dark .se-media__veil { background: radial-gradient(ellipse 40% 34% at 50% 50%, rgba(7, 31, 38, 0.7) 0%, rgba(7, 31, 38, 0) 100%); }
+.se-orbit { position: absolute; top: 50%; right: -6%; height: 125%; aspect-ratio: 1; translate: 0 -50%; overflow: visible; transition: rotate 2.4s var(--ease-out); }
+/* open: lowered so the Visakhapatnam pin and its label sit under the buttons, not behind the copy */
+.se-card.is-open .se-orbit { right: 50%; translate: 50% -36%; height: 112%; opacity: 0.6; }
+.se-card--dark:not(.is-open):hover .se-orbit { rotate: -6deg; }
+.orbit__rim { stroke: rgba(246, 242, 234, 0.28); stroke-width: 0.6; }
+.orbit__ring { stroke: rgba(246, 242, 234, 0.1); stroke-width: 0.5; }
+.orbit__grid { stroke: rgba(246, 242, 234, 0.1); stroke-width: 0.35; }
+.orbit__arc { stroke: var(--brass); stroke-width: 0.6; stroke-opacity: 0.8; stroke-dasharray: 1; stroke-dashoffset: 0; }
+.orbit__dot { fill: var(--ice); }
+.orbit__origin { fill: var(--brass); }
+.orbit__label { fill: var(--ice); font: 500 6.5px var(--f-body); letter-spacing: 0.04em; }
+.orbit__pulse { stroke: var(--brass); stroke-width: 0.5; transform-box: fill-box; transform-origin: center; animation: se-pulse 2.6s var(--ease-out) infinite; }
+.se-card--dark:not(.is-open):hover .orbit__arc { animation: se-draw 1.2s var(--ease-out); }
+/* open: the arcs draw out from Visakhapatnam one after another */
+.se-card.is-open .orbit__arc { animation: se-draw 1.3s var(--ease-out) calc(0.4s + var(--i) * 45ms) backwards; }
+@keyframes se-pulse { from { scale: 0.4; opacity: 1; } to { scale: 1.8; opacity: 0; } }
+@keyframes se-draw { from { stroke-dashoffset: 1; } }
+
+/* grid state: the whole card is the button */
+.se-hit { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: flex-end; align-items: flex-start; gap: 14px; padding: var(--se-pad); color: inherit; font: inherit; text-align: left; border-radius: inherit; }
+.se-hit:focus-visible { outline-offset: -4px; }
+.se-tag { display: inline-block; padding: 6px 12px; border: 1px solid rgba(246, 242, 234, 0.28); border-radius: 999px; color: var(--ice); background: rgba(7, 31, 38, 0.85); }
+.se-card:hover .se-tag { background: rgba(7, 31, 38, 0.9); }
+.se-hit .se-tag { position: absolute; top: var(--se-pad); left: var(--se-pad); }
+.se-title { max-width: 15ch; font-size: var(--fs-h3); line-height: 1.05; }
+.se-card--wild .se-title { max-width: 13ch; font-size: var(--fs-h2); }
+/* 0.88 white on the deep card: well over 4.5:1 */
+.se-markets { max-width: 34ch; color: rgba(246, 242, 234, 0.88); font-size: clamp(0.8125rem, 0.45vw + 0.5rem, 1.0625rem); }
+.se-card--dark .se-title { max-width: 12ch; }
+.se-cta {
+  display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px;
+  border: 1px solid rgba(246, 242, 234, 0.45); border-radius: 999px;
+  background: rgba(7, 31, 38, 0.78); color: var(--ice); font-weight: 500; text-decoration: none;
+  transition: background-color 0.3s, border-color 0.3s;
+}
+.se-cta span { display: inline-block; transition: translate 0.4s var(--ease-out); }
+.se-card:hover .se-cta, .se-cta--link:hover, .se-cta--link:focus-visible { border-color: var(--ice); background: rgba(7, 31, 38, 0.9); }
+.se-card:hover .se-cta span { translate: 4px 0; }
+.se-cta--link { position: absolute; top: var(--se-pad); right: var(--se-pad); z-index: 1; }
+.se-card.is-open :is(.se-hit, .se-cta--link) { visibility: hidden; }
+
+/* open state */
+.se-panel { --se-rail: clamp(240px, 16vw, 380px); position: absolute; inset: 0; display: grid; place-items: center; padding: 96px calc(var(--gutter) + var(--se-rail) + 32px); }
+.se-panel[hidden] { display: none; }
+.se-center { position: relative; z-index: 2; display: grid; justify-items: center; gap: 18px; max-width: 40rem; text-align: center; text-shadow: 0 1px 24px rgba(7, 31, 38, 0.45); }
+.se-heading { font-size: var(--fs-h1); }
+.se-sub { max-width: 36ch; font-size: var(--fs-lead); line-height: 1.4; color: rgba(246, 242, 234, 0.92); }
+.se-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; margin-top: 10px; text-shadow: none; }
+.se-btn { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 22px; border: 1px solid rgba(246, 242, 234, 0.45); border-radius: 999px; color: var(--ice); font: 500 1rem/1 var(--f-body); text-decoration: none; background: rgba(7, 31, 38, 0.85); transition: background-color 0.3s, border-color 0.3s; }
+.se-btn:hover, .se-btn:active { border-color: var(--ice); background: rgba(7, 31, 38, 0.9); }
+.se-btn--primary { border-color: var(--brass); background: var(--brass); color: #10161a; }
+.se-btn--primary:hover, .se-btn--primary:active { border-color: #ea9d76; background: #ea9d76; }
+.se-close { position: absolute; top: 20px; right: 20px; z-index: 3; display: grid; place-items: center; width: 44px; height: 44px; border: 1px solid rgba(246, 242, 234, 0.3); border-radius: 50%; color: var(--ice); background: rgba(7, 31, 38, 0.85); }
+.se-close:hover, .se-close:active { background: rgba(7, 31, 38, 0.9); }
+
+/* the facts: thin-line glass in two even rails at the edges, three a side, clear of the subject in the middle */
+.se-widgets { position: absolute; inset: 14% var(--gutter); display: grid; grid-template-columns: var(--se-rail) 1fr var(--se-rail); grid-template-rows: repeat(3, auto); align-content: space-between; }
+.se-widget { grid-column: 1; display: grid; gap: 6px; padding: 14px 16px; border: 1px solid rgba(246, 242, 234, 0.22); border-radius: 12px; background: rgba(7, 31, 38, 0.85); }
+.se-card.is-open .se-widget { will-change: transform; }
+.se-widget:hover, .se-widget:active { background: rgba(7, 31, 38, 0.9); }
+.se-widget:nth-child(n + 4) { grid-column: 3; }
+.se-widget:nth-child(3n + 1) { grid-row: 1; }
+.se-widget:nth-child(3n + 2) { grid-row: 2; }
+.se-widget:nth-child(3n) { grid-row: 3; }
+.se-widget__label { display: flex; align-items: center; gap: 8px; color: rgba(246, 242, 234, 0.78); }
+.se-widget__label::before { content: ''; width: 5px; height: 5px; border-radius: 50%; background: var(--brass); }
+.se-widget__value { font-size: clamp(1rem, 0.7vw + 0.6rem, 1.25rem); line-height: 1.35; }
+
+/* phones: the cards stack, and an open card is a full-screen sheet with its facts in a compact two-column grid */
+@media (max-width: 768px) {
+  .se { padding: 24px; }
+  .se-grid { grid-template-columns: minmax(0, 1fr); grid-template-rows: none; height: auto; min-height: 0; }
+  /* the two small cards stop at 360 px: at DPR 3 that is the 1080 rows of the 1920 tier, the largest a phone is sent */
+  .se-cell--wild, .se-cell--farmed, .se-cell--world { grid-column: auto; grid-row: auto; height: min(45vh, 360px); height: min(45svh, 360px); }
+  .se-cell--wild { height: 70vh; height: 70svh; }
+  .se-orbit { right: -30%; height: 110%; }
+  .se-panel { display: flex; flex-direction: column; justify-content: flex-start; gap: 20px; overflow-y: auto; overscroll-behavior: contain; padding: 64px 24px calc(56px + env(safe-area-inset-bottom, 0px)); }
+  .se-panel::before { content: ''; position: absolute; top: 10px; left: 50%; width: 40px; height: 4px; margin-left: -20px; border-radius: 2px; background: rgba(246, 242, 234, 0.4); }
+  .se-center { justify-items: start; gap: 12px; text-align: left; }
+  .se-heading { font-size: clamp(2.5rem, 11vw, 3.25rem); }
+  .se-sub { font-size: 1rem; }
+  .se-actions { justify-content: flex-start; margin-top: 4px; }
+  .se-widgets { position: static; order: 1; inset: auto; grid-template-columns: repeat(2, minmax(0, 1fr)); grid-template-rows: none; gap: 8px; }
+  .se-widget, .se-widget:nth-child(n) { grid-column: auto; grid-row: auto; gap: 4px; padding: 10px 12px; will-change: auto; }
+  .se-widget__value { font-size: 0.9375rem; line-height: 1.3; }
+  .se-media__veil { background: linear-gradient(to bottom, rgba(7, 31, 38, 0.55) 0%, rgba(7, 31, 38, 0.35) 45%, rgba(7, 31, 38, 0.75) 100%); }
+  .se-card.is-open .se-orbit { right: -20%; translate: 0 -50%; opacity: 0.5; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .se-media__still, .se-media__loop, .se-orbit, .se-cta span { transition: none; }
+  .se-card:not(.is-open):hover :is(.se-media__still, .se-media__loop) { scale: none; }
+  .orbit__pulse, .se-card--dark:not(.is-open):hover .orbit__arc, .se-card.is-open .orbit__arc { animation: none; }
+  .se-widget, .se-card.is-open .se-widget { will-change: auto; }
+}

@@ -1,0 +1,32 @@
+name: ci
+on:
+  pull_request:
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    # weight's retina runs scroll the whole story at 900 px/s on a GPU-less runner (tests/helpers.ts scrollThrough):
+    # ~6 min each since the helper scrolls to the bottom, where it used to stop once its wheel deltas added up
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with: { node-version: 22, cache: npm }
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm run build
+      - run: npx playwright install --with-deps chromium
+      - run: npx playwright test tests/smoke.spec.ts tests/pages.spec.ts
+      - name: weight + a11y (when present)
+        run: |
+          for t in weight a11y; do if [ -f tests/$t.spec.ts ]; then npx playwright test tests/$t.spec.ts; fi; done
+      - name: scroll perf (report only; runners have no GPU)
+        run: if [ -f tests/scroll-perf.spec.ts ]; then npx playwright test tests/scroll-perf.spec.ts || true; fi
+      - run: npx lhci autorun
+      - if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: reports
+          path: |
+            .lighthouseci
+            perf-report.json
+          if-no-files-found: ignore

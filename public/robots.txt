@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://skylarkexim.com/sitemap.xml

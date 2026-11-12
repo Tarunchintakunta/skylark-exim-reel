@@ -1,0 +1,148 @@
+{
+ "roi": [
+  [
+   [
+    0,
+    0.6
+   ],
+   [
+    0.4,
+    0.6
+   ],
+   [
+    0.4,
+    0.84
+   ],
+   [
+    1,
+    0.84
+   ],
+   [
+    1,
+    1
+   ],
+   [
+    0,
+    1
+   ]
+  ]
+ ],
+ "roi_key": "crate",
+ "crate_r": 200,
+ "crate_b": 256,
+ "crate_g": 0.86,
+ "crate_br": 70,
+ "roi_grow": 13,
+ "roi_lift": 85,
+ "roi_min": 1300,
+ "patches": [
+  {
+   "name": "boat on the horizon, left",
+   "poly": [
+    [
+     270,
+     238
+    ],
+    [
+     385,
+     238
+    ],
+    [
+     385,
+     282
+    ],
+    [
+     270,
+     282
+    ]
+   ],
+   "feather": 6
+  },
+  {
+   "name": "ship on the horizon, right",
+   "poly": [
+    [
+     2115,
+     232
+    ],
+    [
+     2235,
+     232
+    ],
+    [
+     2235,
+     282
+    ],
+    [
+     2115,
+     282
+    ]
+   ],
+   "feather": 6
+  }
+ ],
+ "objects": [
+  {
+   "name": "deck crates, bow, above the hull stripe",
+   "poly": [
+    [
+     1400,
+     555
+    ],
+    [
+     1650,
+     555
+    ],
+    [
+     1650,
+     620
+    ],
+    [
+     1400,
+     618
+    ]
+   ],
+   "key": "crate",
+   "track": [
+    [
+     0.52,
+     0.37,
+     1,
+     0.65
+    ]
+   ],
+   "close": 5
+  },
+  {
+   "name": "deck crates, by the winch, above the hull stripe",
+   "poly": [
+    [
+     2150,
+     555
+    ],
+    [
+     2460,
+     555
+    ],
+    [
+     2460,
+     622
+    ],
+    [
+     2150,
+     621
+    ]
+   ],
+   "key": "crate",
+   "track": [
+    [
+     0.52,
+     0.37,
+     1,
+     0.65
+    ]
+   ],
+   "close": 5
+  }
+ ]
+}

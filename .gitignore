@@ -1,0 +1,15 @@
+node_modules
+dist
+assets-src
+.env*
+!.env.example
+test-results
+playwright-report
+.vercel
+.lighthouseci
+perf-report*.json
+.DS_Store
+/review/
+.claude/worktrees/
+masters/
+*.tsbuildinfo

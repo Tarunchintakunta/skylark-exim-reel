@@ -1,0 +1,374 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="theme-color" content="#071f26" />
+<title>Place an order | Skylark Exim</title>
+<meta name="description" content="Build a seafood export order with Skylark Exim, Visakhapatnam: species, form, grade, glaze, packing, volume, Incoterm and certificates. You get an order reference at once." />
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="Skylark Exim" />
+<meta property="og:title" content="Place an order | Skylark Exim" />
+<meta property="og:description" content="Build a seafood export order with Skylark Exim, Visakhapatnam. You get an order reference at once." />
+<meta property="og:url" content="https://skylarkexim.com/order" />
+<meta property="og:image" content="https://skylarkexim.com/media/hero-loop_1280.webp" />
+<link rel="canonical" href="https://skylarkexim.com/order" />
+<link rel="icon" href="/favicon-48.webp" type="image/webp" />
+<link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+<!-- Standalone on purpose: no app bundle, so this one file is the page and a direct link to share. -->
+<link rel="preload" href="/fonts/instrument-serif-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin />
+<link rel="preload" href="/fonts/inter-tight-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin />
+<link rel="preload" href="/fonts/inter-tight-latin-500-normal.woff2" as="font" type="font/woff2" crossorigin />
+<style>
+/* font-display optional, faces preloaded: a face that misses first paint never swaps in. A swap re-flows the nav, h1 and form on any machine with a wide fallback (DejaVu on a Linux runner: CLS 0.056, 0.15 at 360 px). The faces are already cached from the rest of the site on most visits. */
+@font-face { font-family: 'Instrument Serif'; font-display: optional; src: url('/fonts/instrument-serif-latin-400-normal.woff2') format('woff2'); }
+@font-face { font-family: 'Inter Tight'; font-weight: 400; font-display: optional; src: url('/fonts/inter-tight-latin-400-normal.woff2') format('woff2'); }
+@font-face { font-family: 'Inter Tight'; font-weight: 500; font-display: optional; src: url('/fonts/inter-tight-latin-500-normal.woff2') format('woff2'); }
+:root {
+  --deep-2: #071f26; --deep: #0b2a33; --bay: #123c48; --sea: #2f7d72; --brass: #e08a5f; --ice: #f6f2ea; --steel: #b5bcb8;
+  --hairline: rgba(246, 242, 234, 0.16); --radius: 4px; --gutter: clamp(16px, 4vw, 64px);
+  --f-display: 'Instrument Serif', 'Iowan Old Style', Georgia, serif; --f-body: 'Inter Tight', 'Segoe UI', system-ui, sans-serif;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: var(--deep-2); color: var(--ice); font: 400 clamp(1rem, 0.95rem + 0.2vw, 1.0625rem)/1.55 var(--f-body); }
+a { color: inherit; }
+:focus-visible { outline: 2px solid var(--brass); outline-offset: 2px; }
+.top { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px; padding: 18px var(--gutter); border-bottom: 1px solid var(--hairline); }
+.brand { display: inline-flex; align-items: center; gap: 10px; text-decoration: none; }
+.brand img { width: 44px; height: 44px; }
+.top nav { display: flex; flex-wrap: wrap; gap: 6px clamp(12px, 2vw, 28px); font-size: 0.9375rem; }
+.top nav a { text-decoration: none; opacity: 0.85; }
+/* where the links wrap under the mark anyway, they start on that row: a first paint with half the links parsed fit
+   them beside the mark, and the rest pushed them down (CLS) */
+@media (max-width: 667px) { .top nav { flex-basis: 100%; } }
+.top nav a:hover, .top nav a[aria-current] { opacity: 1; text-decoration: underline; text-underline-offset: 5px; }
+main { max-width: 1120px; margin: 0 auto; padding: clamp(40px, 6vw, 88px) var(--gutter) 96px; }
+.eyebrow { margin: 0 0 12px; color: var(--brass); font-size: 0.8125rem; letter-spacing: 0.06em; text-transform: uppercase; }
+h1 { margin: 0 0 16px; font: 400 clamp(2.5rem, 6vw, 5rem)/1 var(--f-display); }
+.lead { max-width: 46rem; margin: 0 0 56px; color: var(--steel); font-size: clamp(1.0625rem, 1.3vw, 1.25rem); }
+fieldset { min-width: 0; margin: 0 0 56px; padding: 0; border: 0; }
+legend { width: 100%; margin-bottom: 28px; padding-bottom: 14px; border-bottom: 1px solid var(--hairline); font: 400 clamp(1.5rem, 2.4vw, 2.25rem)/1.1 var(--f-display); }
+.grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px 24px; align-items: end; }
+label, .lbl { display: grid; gap: 8px; align-content: start; font-size: 0.875rem; color: var(--steel); }
+.wide { grid-column: 1 / -1; }
+input, select, textarea {
+  width: 100%; min-height: 44px; padding: 10px 12px; border: 1px solid var(--hairline); border-radius: var(--radius);
+  background: var(--deep); color: var(--ice); font: inherit;
+}
+textarea { min-height: 110px; resize: vertical; }
+input:focus, select:focus, textarea:focus { border-color: var(--brass); outline: none; }
+input:user-invalid, select:user-invalid { border-color: #e2705b; }
+.req::after { content: ' *'; color: var(--brass); }
+.item { position: relative; margin-bottom: 20px; padding: clamp(20px, 3vw, 28px); border: 1px solid var(--hairline); border-radius: var(--radius); background: rgba(18, 60, 72, 0.35); }
+.item h3 { margin: 0 0 20px; font: 500 0.875rem/1 var(--f-body); letter-spacing: 0.04em; text-transform: uppercase; color: var(--brass); }
+.item .remove { position: absolute; top: 12px; right: 12px; min-height: 36px; padding: 6px 14px; }
+.qty { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 3fr); gap: 8px; }
+.checks { display: flex; flex-wrap: wrap; gap: 12px 28px; padding-top: 4px; }
+.checks label { display: inline-flex; align-items: center; gap: 8px; color: var(--ice); font-size: 0.9375rem; }
+.checks input { width: 18px; min-height: 18px; margin: 0; accent-color: var(--brass); }
+.grid .wide.lbl { margin-top: 8px; }
+@media (max-width: 860px) { .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 520px) { .grid { grid-template-columns: 1fr; } }
+button, .btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; padding: 10px 18px;
+  border: 1px solid var(--hairline); border-radius: var(--radius); background: transparent; color: var(--ice); font: 500 0.9375rem var(--f-body);
+  text-decoration: none; cursor: pointer;
+}
+button:hover, .btn:hover { border-color: var(--ice); }
+.primary { background: var(--brass); border-color: var(--brass); color: var(--deep-2); }
+.primary:hover { background: #ea9a71; border-color: #ea9a71; }
+.primary[disabled] { opacity: 0.6; cursor: progress; }
+.actions { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 16px; }
+.note { color: var(--steel); font-size: 0.8125rem; }
+.error { color: #f0907b; }
+.hp { position: absolute; left: -9999px; }
+#done { display: none; }
+#done.is-on { display: block; }
+.ref { display: inline-block; margin: 8px 0 24px; padding: 10px 16px; border: 1px solid var(--brass); border-radius: var(--radius); font: 400 clamp(1.75rem, 4vw, 2.75rem)/1 var(--f-display); color: var(--brass); }
+.sheet { margin: 32px 0; padding: clamp(16px, 3vw, 32px); border: 1px solid var(--hairline); border-radius: var(--radius); background: var(--deep); }
+.sheet h2 { margin: 0 0 4px; font: 400 1.75rem/1.1 var(--f-display); }
+.sheet table { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
+.sheet th, .sheet td { padding: 8px 10px 8px 0; border-bottom: 1px solid var(--hairline); text-align: left; vertical-align: top; }
+.sheet th { color: var(--steel); font-weight: 400; }
+.scroll { overflow-x: auto; margin: 16px 0; }
+.scroll table { min-width: 620px; }
+dl { display: grid; grid-template-columns: minmax(120px, 200px) 1fr; gap: 6px 16px; margin: 16px 0 0; font-size: 0.875rem; }
+dt { color: var(--steel); }
+dd { margin: 0; overflow-wrap: anywhere; }
+footer { padding: 32px var(--gutter); border-top: 1px solid var(--hairline); color: var(--steel); font-size: 0.8125rem; }
+@media (max-width: 640px) { dl { grid-template-columns: 1fr; } dt { margin-top: 8px; } }
+@media (prefers-reduced-motion: no-preference) { #done.is-on { animation: rise 0.6s cubic-bezier(0.22, 1, 0.36, 1); } }
+@keyframes rise { from { opacity: 0; transform: translateY(12px); } }
+@media print {
+  :root { --ice: #0b2a33; --steel: #4a5a5e; --hairline: #c9cfcc; --deep: #fff; }
+  body { background: #fff; }
+  .top nav, .no-print, footer { display: none !important; }
+  main { padding: 0; }
+  .sheet { border: 0; padding: 0; margin: 0; }
+  .ref { color: #a84c24; border-color: #a84c24; }
+  .scroll table { min-width: 0; }
+}
+</style>
+</head>
+<body>
+<header class="top">
+  <a class="brand" href="/" aria-label="Skylark Exim, home">
+    <img src="/logo-128.webp" width="44" height="44" alt="" decoding="async" fetchpriority="low" />
+    <span>Skylark Exim</span>
+  </a>
+  <nav aria-label="Site">
+    <a href="/">Home</a>
+    <a href="/story">Our Story</a>
+    <a href="/#products">Products</a>
+    <a href="/#markets">Markets</a>
+    <a href="/#about">About</a>
+    <a href="/quote">Quote</a>
+    <a href="/order" aria-current="page">Order</a>
+    <a href="/#contact">Contact</a>
+  </nav>
+</header>
+
+<!-- above the form: product 1 is cloned from it inline, where it goes (below) -->
+<template id="item-tpl">
+  <div class="item">
+    <h3>Product <span class="n"></span></h3>
+    <button type="button" class="remove" aria-label="Remove this product">Remove</button>
+    <div class="grid">
+      <label><span class="req">Species</span>
+        <select data-k="species" required>
+          <option>Vannamei Shrimp</option><option>Black Tiger Shrimp</option><option>Wild-Caught Marine Fish &amp; Cephalopods</option>
+        </select>
+      </label>
+      <label><span class="req">Form</span>
+        <select data-k="form" required>
+          <option value="HOSO">HOSO (head-on shell-on)</option><option value="HLSO">HLSO (headless shell-on)</option>
+          <option value="PD">PD (peeled &amp; deveined)</option><option value="PDTO">PDTO (peeled, deveined, tail-on)</option>
+          <option>Whole Round</option><option>IQF / Block Frozen</option>
+        </select>
+      </label>
+      <label><span>Count / size grade</span><input data-k="grade" list="grades" maxlength="40" placeholder="e.g. 21/25, 31/40, 300-500 g" /></label>
+      <label><span>Glaze</span>
+        <select data-k="glaze"><option>0%</option><option>10%</option><option>15%</option><option>20%</option></select>
+      </label>
+      <label><span>Master carton</span>
+        <select data-k="packing"><option>10 x 1 kg</option><option>6 x 2 kg</option><option value="custom">Custom…</option></select>
+      </label>
+      <label class="custom" hidden><span>Custom packing</span><input data-k="packingCustom" maxlength="80" placeholder="e.g. 20 x 500 g printed box" /></label>
+      <div class="lbl"><span class="req">Quantity</span>
+        <div class="qty">
+          <input data-k="qty" type="number" min="0.1" step="0.1" required aria-label="Quantity" />
+          <select data-k="unit" aria-label="Unit"><option>MT</option><option>x 20' reefer FCL</option><option>x 40' reefer FCL</option></select>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<main id="main">
+  <section id="form-view">
+    <p class="eyebrow">Order</p>
+    <h1>Build your order</h1>
+    <p class="lead">Add each product line, then volume, shipping and your details. You get an order reference at once, and our Visakhapatnam desk confirms price and ship date by email.</p>
+
+    <form id="order" novalidate>
+      <fieldset>
+        <legend>Products</legend>
+        <div id="items"></div>
+        <!-- product 1 is in place before anything below it can paint: on a slow link the parser paints early, and an item
+             added by the script at the end of the body pushed Shipping and Your details down (CLS) -->
+        <script>(function(){var el=document.getElementById('item-tpl').content.firstElementChild.cloneNode(true);el.querySelector('.n').textContent='1';el.querySelector('.remove').hidden=true;document.getElementById('items').append(el)})()</script>
+        <button type="button" id="add-item">+ Add another product</button>
+      </fieldset>
+
+      <fieldset>
+        <legend>Shipping</legend>
+        <div class="grid">
+          <label><span class="req">Incoterm</span>
+            <select name="incoterm" required>
+              <option>FOB Visakhapatnam</option><option>CFR</option><option>CIF</option>
+            </select>
+          </label>
+          <label><span class="req">Destination port</span><input name="port" required maxlength="120" placeholder="e.g. Rotterdam, Ho Chi Minh, Long Beach" /></label>
+          <label><span>Target ship window</span><input name="window" type="month" /></label>
+          <div class="lbl wide"><span>Certificates required</span>
+            <div class="checks">
+              <label><input type="checkbox" name="certs" value="HACCP" /> HACCP</label>
+              <label><input type="checkbox" name="certs" value="EU Approval" /> EU Approval</label>
+              <label><input type="checkbox" name="certs" value="USFDA" /> USFDA</label>
+              <label><input type="checkbox" name="certs" value="BAP" /> BAP</label>
+              <label><input type="checkbox" name="certs" value="Halal" /> Halal</label>
+              <label><input type="checkbox" name="certs" value="Health Certificate" /> Health Certificate</label>
+            </div>
+          </div>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Your details</legend>
+        <div class="grid">
+          <label><span class="req">Company name</span><input name="company" required minlength="2" maxlength="160" autocomplete="organization" /></label>
+          <label><span class="req">Contact name</span><input name="name" required minlength="2" maxlength="120" autocomplete="name" /></label>
+          <label><span class="req">Work email</span><input name="email" type="email" required maxlength="200" autocomplete="email" /></label>
+          <label><span>Phone / WhatsApp</span><input name="phone" type="tel" maxlength="40" autocomplete="tel" /></label>
+          <label><span class="req">Country</span><input name="country" required minlength="2" maxlength="80" autocomplete="country-name" /></label>
+          <label class="wide"><span>Special instructions</span><textarea name="notes" maxlength="2000" placeholder="Brand or private label, printing, inspection, payment terms…"></textarea></label>
+          <label class="hp" aria-hidden="true">Website <input name="website" tabindex="-1" autocomplete="off" /></label>
+        </div>
+      </fieldset>
+
+      <div class="actions">
+        <button class="primary" type="submit" id="submit">Send order</button>
+        <p class="note" id="status" role="status" aria-live="polite">Fields marked * are required.</p>
+      </div>
+    </form>
+  </section>
+
+  <section id="done" aria-labelledby="done-title" tabindex="-1">
+    <p class="eyebrow no-print">Order received</p>
+    <h1 id="done-title" class="no-print">Thank you</h1>
+    <p class="lead no-print" id="done-lead"></p>
+    <div class="actions no-print">
+      <button class="primary" type="button" id="print">Download PDF spec sheet</button>
+      <a class="btn" id="mail" href="#">Send via Email</a>
+      <a class="btn" id="wa" href="#" target="_blank" rel="noopener">Send via WhatsApp</a>
+      <a class="btn" href="/order">New order</a>
+    </div>
+    <article class="sheet" id="sheet"></article>
+  </section>
+</main>
+
+<footer>Skylark Exim · Sheela Nagar, Visakhapatnam, Andhra Pradesh · <a href="mailto:info@skylarkexim.com">info@skylarkexim.com</a> · +91-9000 604 070</footer>
+
+<datalist id="grades">
+  <option value="U/10"></option><option value="16/20"></option><option value="21/25"></option><option value="26/30"></option><option value="31/40"></option>
+  <option value="41/50"></option><option value="51/60"></option><option value="61/70"></option><option value="71/90"></option><option value="91/110"></option>
+</datalist>
+
+<script>
+(() => {
+  const TO = 'info@skylarkexim.com'
+  const WA = '919000604070'
+  // replaced at build from VITE_ORDER_WEBHOOK_URL (vite.config.ts); left as is, the webhook is skipped
+  const WEBHOOK = '__ORDER_WEBHOOK_URL__'
+  const $ = (s, el = document) => el.querySelector(s)
+  const form = $('#order'), items = $('#items'), tpl = $('#item-tpl'), status = $('#status')
+  const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c])
+
+  const renumber = () => items.querySelectorAll('.item').forEach((el, i, all) => {
+    $('.n', el).textContent = i + 1
+    $('.remove', el).hidden = all.length === 1
+  })
+  const wire = (el) => {
+    $('[data-k=packing]', el).addEventListener('change', (e) => { $('.custom', el).hidden = e.target.value !== 'custom' })
+    $('.remove', el).addEventListener('click', () => { el.remove(); renumber() })
+    return el
+  }
+  const addItem = () => {
+    const el = wire(tpl.content.firstElementChild.cloneNode(true))
+    items.append(el)
+    renumber()
+    return el
+  }
+  // product 1 was cloned inline under #items
+  wire($('.item', items))
+  $('#add-item').addEventListener('click', () => $('select', addItem()).focus())
+
+  const refId = () => {
+    const a = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789', r = crypto.getRandomValues(new Uint8Array(4))
+    return `SKL-${new Date().getFullYear()}-${[...r].map((b) => a[b % a.length]).join('')}`
+  }
+
+  const read = () => {
+    const f = new FormData(form), v = (k) => (f.get(k) || '').toString().trim()
+    return {
+      ref: refId(),
+      date: new Date().toISOString().slice(0, 10),
+      items: [...items.querySelectorAll('.item')].map((el) => {
+        const g = (k) => $(`[data-k=${k}]`, el).value.trim()
+        return { species: g('species'), form: g('form'), grade: g('grade'), glaze: g('glaze'), packing: g('packing') === 'custom' ? g('packingCustom') || 'Custom' : g('packing'), quantity: `${g('qty')} ${g('unit')}` }
+      }),
+      incoterm: v('incoterm'), port: v('port'), window: v('window'), certs: f.getAll('certs'),
+      company: v('company'), name: v('name'), email: v('email'), phone: v('phone'), country: v('country'), notes: v('notes'),
+    }
+  }
+
+  const text = (o) => [
+    `Skylark Exim order ${o.ref} (${o.date})`, '',
+    ...o.items.map((it, i) => `${i + 1}. ${it.species}, ${it.form}${it.grade ? `, ${it.grade}` : ''}, glaze ${it.glaze}, ${it.packing}, ${it.quantity}`), '',
+    `Incoterm: ${o.incoterm}`, `Destination port: ${o.port}`, `Ship window: ${o.window || 'open'}`, `Certificates: ${o.certs.join(', ') || 'none named'}`, '',
+    `Company: ${o.company}`, `Contact: ${o.name}`, `Email: ${o.email}`, `Phone/WhatsApp: ${o.phone || '-'}`, `Country: ${o.country}`,
+    ...(o.notes ? ['', `Notes: ${o.notes}`] : []),
+  ].join('\n')
+
+  const sheet = (o) => `
+    <p class="eyebrow">Order spec sheet</p>
+    <h2>Skylark Exim</h2>
+    <p class="note">Sheela Nagar, Visakhapatnam, Andhra Pradesh, India · ${TO}</p>
+    <div class="ref">${esc(o.ref)}</div>
+    <div class="scroll"><table>
+      <thead><tr><th>#</th><th>Species</th><th>Form</th><th>Grade</th><th>Glaze</th><th>Master carton</th><th>Quantity</th></tr></thead>
+      <tbody>${o.items.map((it, i) => `<tr><td>${i + 1}</td><td>${esc(it.species)}</td><td>${esc(it.form)}</td><td>${esc(it.grade || '-')}</td><td>${esc(it.glaze)}</td><td>${esc(it.packing)}</td><td>${esc(it.quantity)}</td></tr>`).join('')}</tbody>
+    </table></div>
+    <dl>
+      <dt>Date</dt><dd>${o.date}</dd>
+      <dt>Incoterm</dt><dd>${esc(o.incoterm)}</dd>
+      <dt>Destination port</dt><dd>${esc(o.port)}</dd>
+      <dt>Ship window</dt><dd>${esc(o.window || 'Open')}</dd>
+      <dt>Certificates</dt><dd>${esc(o.certs.join(', ') || 'None named')}</dd>
+      <dt>Company</dt><dd>${esc(o.company)}</dd>
+      <dt>Contact</dt><dd>${esc(o.name)}</dd>
+      <dt>Email</dt><dd>${esc(o.email)}</dd>
+      <dt>Phone / WhatsApp</dt><dd>${esc(o.phone || '-')}</dd>
+      <dt>Country</dt><dd>${esc(o.country)}</dd>
+      ${o.notes ? `<dt>Special instructions</dt><dd>${esc(o.notes)}</dd>` : ''}
+    </dl>
+    <p class="note">Indicative order. Price, final grade and ship date are confirmed by Skylark Exim in writing.</p>`
+
+  const send = async (o) => {
+    const body = { _subject: `New order ${o.ref}: ${o.company} (${o.country})`, _replyto: o.email, _template: 'box', _captcha: 'false', Reference: o.ref, Order: text(o) }
+    const mail = fetch(`https://formsubmit.co/ajax/${TO}`, { method: 'POST', headers: { 'Content-Type': 'application/json', Accept: 'application/json' }, body: JSON.stringify(body) })
+      .then((r) => r.json()).then((j) => j.success === 'true' || j.success === true)
+    // Apps Script answers no CORS preflight: plain text, no-cors, fire and forget
+    const sheetRow = WEBHOOK.startsWith('https://')
+      ? fetch(WEBHOOK, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ ...o, summary: text(o) }) }).then(() => true)
+      : Promise.resolve(false)
+    const [m, s] = await Promise.allSettled([mail, sheetRow])
+    return (m.status === 'fulfilled' && m.value) || (s.status === 'fulfilled' && s.value)
+  }
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault()
+    if (form.website.value) return
+    if (!form.checkValidity()) {
+      form.reportValidity()
+      status.textContent = 'Please complete the required fields.'
+      status.className = 'note error'
+      return
+    }
+    const o = read(), btn = $('#submit')
+    btn.disabled = true
+    status.className = 'note'
+    status.textContent = 'Sending…'
+    let ok = false
+    try { ok = await send(o) } catch { ok = false }
+    const t = text(o)
+    $('#sheet').innerHTML = sheet(o)
+    $('#mail').href = `mailto:${TO}?subject=${encodeURIComponent(`Order ${o.ref}: ${o.company}`)}&body=${encodeURIComponent(t)}`
+    $('#wa').href = `https://wa.me/${WA}?text=${encodeURIComponent(t)}`
+    $('#done-lead').textContent = ok
+      ? `Your order reference is ${o.ref}. Our desk has it now and replies to ${o.email}.`
+      : `Your order reference is ${o.ref}. We could not send it automatically: please use Send via Email or Send via WhatsApp below so it reaches us.`
+    $('#form-view').hidden = true
+    $('#done').classList.add('is-on')
+    document.title = `Order ${o.ref} | Skylark Exim`
+    scrollTo(0, 0)
+    $('#done').focus()
+  })
+  $('#print').addEventListener('click', () => print())
+})()
+</script>
+</body>
+</html>

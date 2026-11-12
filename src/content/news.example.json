@@ -1,0 +1,9 @@
+{
+  "slug": "example-do-not-copy-until-it-is-real",
+  "date": "YYYY-MM-DD",
+  "title": "Title copied from skylarkexim.com",
+  "summary": "One or two sentences from that page. The card shows two lines.",
+  "image": "/media/news/your-image.webp",
+  "body": "Optional. Shown on /news/your-slug. Leave it out to reuse the summary.",
+  "source": "https://skylarkexim.com/the-real-page"
+}

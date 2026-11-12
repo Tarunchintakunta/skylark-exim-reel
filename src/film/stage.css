@@ -1,0 +1,100 @@
+/* clip, not hidden: hidden makes a scroll container, and Safari latches a trackpad gesture onto this fixed layer so the page never moves. pointer-events stay off except while the globe is the picture. */
+.stage { position: fixed; inset: 0; z-index: var(--z-stage); overflow: clip; background: var(--deep-2); contain: strict; pointer-events: none; }
+.stage__layer, .stage__video {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  object-fit: cover; opacity: 0; pointer-events: none;
+}
+.stage__video { z-index: 1; }
+/* desktop frame sequences (#hd2): the canvas draws cover-fit itself, sized by its CSS box */
+.stage__seq { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 1; opacity: 0; pointer-events: none; }
+/* a segment's reframe (chapters.ts Media zoom, set by scrub.ts): clip, frame sequence and poster scale together */
+.stage__video, .stage__seq, img.stage__layer { transform: scale(var(--zoom, 1)); transform-origin: var(--zoom-x, 50%) 50%; }
+.stage__gradient {
+  /* sea placeholder: deep open-sea blue with a faint horizon */
+  background:
+    linear-gradient(180deg, rgba(244, 239, 230, 0.08) 0%, rgba(244, 239, 230, 0) 34%),
+    radial-gradient(120% 90% at 62% 28%, var(--bay) 0%, var(--deep) 46%, var(--deep-2) 100%);
+}
+.stage__light { background: linear-gradient(180deg, var(--light) 0%, var(--light-2) 100%); }
+.stage.is-light .stage__light { pointer-events: auto; }
+.stage__veil { position: absolute; inset: 0; z-index: 3; background: var(--deep-2); opacity: 0; pointer-events: none; }
+.stage.veil-light .stage__veil { background: var(--light); }
+.stage__scrim {
+  position: absolute; inset: 0; z-index: 4; pointer-events: none; transition: opacity 0.5s;
+  /* bottom + left scrims keep bottom-left copy ≥ 4.5:1 even over bright plant frames */
+  background: var(--scrim), linear-gradient(90deg, rgba(7, 31, 38, 0.72) 0%, rgba(7, 31, 38, 0.35) 38%, rgba(7, 31, 38, 0) 62%);
+}
+.stage.is-light .stage__scrim { opacity: 0; }
+/* daylight chapters (the port): neutral black, no deep-sea tint over the footage. Bottom shade under the caption, and
+   a side shade to 0.55 behind the body copy on whichever side the copy sits */
+.stage.is-soft .stage__scrim {
+  --side: 90deg;
+  background:
+    linear-gradient(to top, rgba(0, 0, 0, 0.62) 0%, rgba(0, 0, 0, 0.3) 26%, rgba(0, 0, 0, 0) 48%),
+    linear-gradient(var(--side), rgba(0, 0, 0, 0.55) 0%, rgba(0, 0, 0, 0.3) 30%, rgba(0, 0, 0, 0) 55%);
+}
+.stage.is-soft.is-right .stage__scrim { --side: 270deg; }
+@media (max-width: 819px) { .stage.is-soft.is-right .stage__scrim { --side: 90deg; } }
+/* CG chapters (scrim: 'cg'): no full-frame tint. A neutral (not navy) shade sits only behind the caption text, sized to
+   the caption block (bottom-left, or right for right-column chapters), so the boat and the light stay at full exposure.
+   tests/story-caption-contrast checks the copy over it. Phones: a bottom shade under the full-width caption. */
+.stage.is-cg .stage__scrim {
+  --corner: 0% 82%;
+  /* tall enough to reach the eyebrow line over bright water (p2: 2.2:1 at 64%). PR #324: the one-grade regrade lifted the
+     CG to the port's exposure (mean luma 146), so the shade is larger and darker (p1 eyebrow 3.68:1 at 0.72/0.62) */
+  background: radial-gradient(56% 92% at var(--corner), rgba(0, 0, 0, 0.8) 0%, rgba(0, 0, 0, 0.74) 58%, rgba(0, 0, 0, 0) 100%);
+}
+.stage.is-cg.is-right .stage__scrim { --corner: 100% 82%; }
+@media (max-width: 819px) {
+  .stage.is-cg .stage__scrim, .stage.is-cg.is-right .stage__scrim {
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.8) 0%, rgba(0, 0, 0, 0.72) 44%, rgba(0, 0, 0, 0) 70%);
+  }
+}
+/* the world chapter's scroll spacer lets pointers through to the globe under it (its copy re-enables its own) */
+.chapter[data-chapter="world"] { pointer-events: none; }
+
+/* floating cue: under the captions (their bottom edge sits higher), never a blur, never stealing the globe */
+.stage__cue {
+  position: absolute; left: 50%; bottom: 18px; z-index: 6; transform: translateX(-50%);
+  margin: 0; max-width: min(92vw, 40rem); pointer-events: none; text-align: center;
+  color: rgba(246, 242, 234, 0.94); opacity: 0; visibility: hidden;
+}
+.stage__cue[data-cue='explore'],
+.stage__cue[data-cue='continue'],
+.stage__cue[data-cue='world'] { opacity: 1; visibility: visible; }
+.stage__cue-pill {
+  display: inline-block; padding: 8px 16px; border: 1px solid rgba(246, 242, 234, 0.28); border-radius: 999px;
+  background: rgba(7, 31, 38, 0.86); color: rgba(246, 242, 234, 0.94);
+  font-size: 0.8125rem; letter-spacing: 0.02em; line-height: 1.35;
+}
+.stage__cue span[data-for] { display: none; }
+.stage__cue[data-cue='explore'] [data-for='explore'],
+.stage__cue[data-cue='continue'] [data-for='continue'],
+.stage__cue[data-cue='world'] [data-for='world'] { display: inline; }
+.stage__cue[data-cue='world'] .stage__cue-pill { border-radius: 16px; max-width: 34rem; }
+.stage.is-light .stage__cue { color: var(--ink); }
+.stage.is-light .stage__cue-pill {
+  color: var(--ink); background: rgba(244, 239, 230, 0.94); border-color: rgba(7, 31, 38, 0.16);
+}
+@media (max-width: 767px) {
+  .stage__cue { bottom: 14px; }
+  .stage__cue[data-cue='explore']::after,
+  .stage__cue[data-cue='continue']::after { display: none; }
+}
+.stage__cue[data-cue='explore']::after,
+.stage__cue[data-cue='continue']::after {
+  content: ''; display: block; width: 1px; height: 22px; margin: 8px auto 0; background: currentColor;
+  transform-origin: top; animation: stage-cue 2.4s var(--ease-io) infinite;
+}
+@keyframes stage-cue {
+  0% { transform: scaleY(0); }
+  50% { transform: scaleY(1); transform-origin: top; }
+  51% { transform-origin: bottom; }
+  100% { transform: scaleY(0); transform-origin: bottom; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .stage__cue::after { animation: none; }
+}
+
+/* documentation desk (#196): a real, lightly blurred photo; on narrow screens the copy spans the whole width, so the photo dims to keep AA */
+@media (max-width: 819px) { .stage__dom { filter: brightness(0.45); } }
